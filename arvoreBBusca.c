@@ -1,5 +1,3 @@
-//Trabalho 2 ED, por João Victor de Souza Pimentel Cunha e Julio Carvalho Santos de Souza.
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -19,7 +17,7 @@ arvore *ler_arvore(FILE *arq)
   fscanf(arq, "%c", &c);     //ler '('
   fscanf(arq, "%int", &num); //ler a raiz
 
-  if (num == -1) //é null?
+  if (num == -1) //Ã© null?
   {
     fscanf(arq, "%c", &c);
     return NULL;
@@ -210,10 +208,55 @@ arvore *remover(arvore *a, int x){
     return a;
 }
 
-int menu(arvore *a)
+int intermediarios(arvore *a, int x, int y){
+	int cont = 0;
+	if(a == NULL){
+		return 0;
+	}
+	if(a->valor < x){
+    printf("%d fora\n",a->valor);
+    cont += intermediarios(a->dir, x, y);
+    return cont;
+  }else if(a->valor > y){
+    printf("%d fora\n",a->valor);
+    cont += intermediarios(a->esq, x, y);
+    return cont;
+  }
+  else{
+        cont++;
+        printf("%d\n", a->valor);
+        cont += intermediarios(a->esq, x, y);
+        cont += intermediarios(a->dir, x, y);
+        return cont;
+	}
+}
+
+int Similares(arvore *a, arvore *b){
+    if(a == NULL || b == NULL){
+        if(a == NULL && b == NULL){
+            return 1;
+        }
+        else{
+            return 0;
+        }
+    }
+    else{
+        int esq, dir;
+        esq = Similares( a->esq, b->esq);
+        dir = Similares( a->dir, b->dir);
+        if (esq == 0 || dir == 0){
+            return 0;
+        }
+        else{
+            return 1;
+        }
+    }
+}
+
+int menu(arvore *a,arvore *b)
 {
   char nomarq[30];
-  int op, x, folha;
+  int op, x, folha,y;
   FILE *arq;
 
   while (op != 1000)
@@ -227,7 +270,9 @@ int menu(arvore *a)
     printf("5 - Imprimir Nos Folhas Menores que um valor x.\n\n");
     printf("6 - Inserir no na Arvore\n\n");
     printf("7 - Remover no da Arvore\n\n");
-    printf("8 - Sair\n\n");
+    printf("8 - Checar NÃ³s Entre Dois Valores(X e Y)\n\n");
+    printf("9 - Checar Se Duas Arvores SÃ£o Similares\n\n");
+    printf("10 - Sair\n\n");
     scanf("%d", &op);
     system("cls");
     switch (op)
@@ -347,9 +392,26 @@ int menu(arvore *a)
       break;
 
     case 8:
-      a = destruir(a);
-      return 0;
+        printf("Digite os valores: ");
+        scanf("%d %d",&x,&y);
+        printf("\n\n");
+        printf("\nExistem %d nos entre esses valores\n",intermediarios(a,x,y));
+        system("pause");
       break;
+    case 9:
+        if(Similares(a,b)==0){
+            printf("As Arvores Nao Sao Similares\n\n");
+        }
+        else{
+            printf("As Arvores Sao Similares");
+        }
+        system("pause");
+        break;
+
+    case 10:
+        a = destruir(a);
+        return 0;
+        break;
 
     default:
       printf("\n\nDigite uma opcao valida\n\n\n\n\n");
@@ -361,8 +423,14 @@ int menu(arvore *a)
 
 int main()
 {
-  arvore *a = NULL;
-  menu(a);
+    FILE *arqb;
+    arvore *a = NULL;
+    arvore *b = NULL;
+    //arqb = fopen("AVL.txt", "rt");
+    //b = ler_arvore(arqb);
+    //fclose(arqb);
+  menu(a,b);
 
   return 0;
 }
+
